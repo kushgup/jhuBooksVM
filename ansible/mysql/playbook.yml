@@ -1,0 +1,12 @@
+---
+- name: install mysql
+  apt: pkg=mysql-server
+
+- name: create database
+  mysql_db: name=simons_fund state=present
+
+- name: create test database
+  mysql_db: name=simons_fund_test state=present
+
+- name: start mysql
+  service: name=mysql state=started

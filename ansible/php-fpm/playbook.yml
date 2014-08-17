@@ -1,0 +1,49 @@
+---
+- name: add ppa for PHP 5.4
+  apt_repository: repo="ppa:ondrej/php5-oldstable" update_cache=yes
+
+- name: install php with php-fpm
+  apt: pkg={{ item }}
+  with_items:
+  - php5-fpm
+  - php5-cli
+  - php5-mcrypt
+  - php5-mysqlnd
+  - php5-xdebug
+  - php5-curl
+  notify:
+    - restart php-fpm
+
+- name: set permissions for php-fpm socket
+  lineinfile: dest=/etc/php5/fpm/pool.d/www.conf line="{{ item.option }} = {{ item.value }}"
+  with_items:
+    - { option: 'listen.owner', value: 'www-data' }
+    - { option: 'listen.group', value: 'www-data' }
+    - { option: 'listen.mode', value: '0660' }
+  notify:
+    - restart php-fpm
+
+- name: enable php errors
+  ini_file: dest=/etc/php5/fpm/php.ini option={{ item.option }} value={{ item.value }} section=PHP
+  with_items:
+    - { option: 'display_errors', value: 'On' }
+    - { option: 'html_errors', value: 'On' }
+  notify:
+    - restart php-fpm
+
+- name: enable xdebug options
+  ini_file: dest=/etc/php5/fpm/php.ini option={{ item.option }} value={{ item.value }} section=xdebug
+  with_items:
+    - { option: 'xdebug.remote_enable', value: '1' }
+    - { option: 'xdebug.remote_connect_back', value: '1' }
+    - { option: 'xdebug.var_display_max_depth', value: '5' }
+    - { option: 'xdebug.profiler_enable_trigger', value: '1' }
+    - { option: 'xdebug.profiler_output_dir', value: '\"/vagrant/xdebug\"' }
+  notify:
+    - restart php-fpm
+
+- name: install composer
+  shell: chdir=/usr/local/bin curl -sS https://getcomposer.org/installer | php -- --filename=composer
+
+- name: install composer packages
+  command: composer install chdir=/vagrant

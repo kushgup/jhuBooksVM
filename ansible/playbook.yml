@@ -1,0 +1,26 @@
+---
+- hosts: all
+  sudo: yes
+  handlers:
+    - include: nginx/handlers.yml
+    - include: php-fpm/handlers.yml
+  tasks:
+    - name: update apt
+      apt: update_cache=yes
+    - name: install python-mysqldb for ansible
+      apt: pkg=python-mysqldb
+    - name: install pycurl for ansible
+      apt: pkg=python-pycurl
+    - name: install git
+      apt: pkg=git
+    - name: install curl
+      apt: pkg=curl
+    - include: php-fpm/playbook.yml
+    - include: nginx/playbook.yml
+    - include: mysql/playbook.yml
+    - include: node/playbook.yml
+    - include: adminer/playbook.yml
+    - name: add cd to bashrc
+      lineinfile: dest=/home/vagrant/.bashrc line="cd /vagrant"
+    - name: add composer bin to bashrc
+      lineinfile: dest=/home/vagrant/.bashrc line="PATH=/vagrant/vendor/bin:$PATH"

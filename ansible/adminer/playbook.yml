@@ -1,0 +1,5 @@
+---
+- name: create /var/adminer
+  command: mkdir /var/adminer creates=/var/adminer
+- name: download adminer
+  command: wget "http://www.adminer.org/latest.php" -O /var/adminer/adminer.php

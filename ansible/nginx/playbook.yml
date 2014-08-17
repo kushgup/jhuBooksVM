@@ -1,0 +1,11 @@
+---
+- name: install nginx
+  apt: pkg=nginx
+- name: add default site config
+  copy: src=nginx/server.conf dest=/etc/nginx/sites-available/default mode=0755
+  notify:
+    - restart nginx
+- name: disable sendfile for vagrant compatability
+  lineinfile: dest=/etc/nginx/nginx.conf regexp="sendfile" line="sendfile off;"
+  notify:
+    - restart nginx

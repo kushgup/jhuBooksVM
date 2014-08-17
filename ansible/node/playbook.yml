@@ -1,0 +1,12 @@
+---
+- name: add ppa for node
+  apt_repository: repo="ppa:chris-lea/node.js" update_cache=yes
+
+- name: install node from ppa
+  apt: pkg=nodejs
+
+- name: install gulp globally
+  npm: name=gulp global=yes
+
+- name: install projects node packages via npm
+  npm: path=/vagrant
